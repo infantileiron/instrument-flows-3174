@@ -3,7 +3,7 @@ import json
 
 from fastapi import HTTPException
 
-from src.constants.domain import Role, RunStatus
+from src.constants.domain import ReceiptKind, Role, RunStatus
 from src.models.db import one, rows
 from src.services.catalog import audit, catalog
 from src.utils.crypto import canonical
@@ -28,7 +28,15 @@ def snapshot_for(cursor, plan):
     originals = rows(cursor, f'''SELECT o.* FROM receipts o JOIN (
         SELECT original_id FROM receipts WHERE {scope} AND original_id IS NOT NULL
         ) r ON r.original_id=o.id ORDER BY o.id''', params)
-    snapshot = {**catalog(cursor), 'receipts': receipts, 'originals': originals}
+    # 窗口开始前补录、但截至方案末日仍生效的冲销也要参与"排除已冲销原单"，只随新快照进入新报告。
+    prior_scope = ('kind=%s AND effective_on < %s AND effective_on <= %s '
+                   'AND (%s IS NULL OR instrument=%s)')
+    prior_params = (ReceiptKind.REVERSAL, plan['start_on'], plan['end_on'],
+                    plan['instrument'], plan['instrument'])
+    prior_reversals = rows(cursor, f'''SELECT * FROM receipts WHERE {prior_scope} ORDER BY id''',
+                           prior_params)
+    snapshot = {**catalog(cursor), 'receipts': receipts, 'originals': originals,
+                'prior_reversals': prior_reversals}
     if plan['instrument']:
         snapshot['instruments'] = [item for item in snapshot['instruments'] if item['code'] == plan['instrument']]
     return canonical(snapshot)

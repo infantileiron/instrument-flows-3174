@@ -1,6 +1,7 @@
 import { roleNames } from './constants/domain.js';
 import { catalogPage } from './pages/catalog.js';
 import { bindLedger, ledgerPage } from './pages/ledger.js';
+import { bindLineage, lineagePage } from './pages/lineage.js';
 import { bindLogin, loginPage } from './pages/login.js';
 import { bindPlans, plansPage } from './pages/plans.js';
 import { bindReport, reportPage } from './pages/report.js';
@@ -10,7 +11,10 @@ import { load } from './stores/workspace.js';
 import { escape as e } from './utils/html.js';
 
 const app = document.querySelector('#app');
-const pages = { report: reportPage, ledger: ledgerPage, reversals: () => ledgerPage(true), plans: plansPage, catalog: catalogPage };
+const pages = {
+  report: reportPage, lineage: () => lineagePage(route().family),
+  ledger: ledgerPage, reversals: () => ledgerPage(true), plans: plansPage, catalog: catalogPage,
+};
 let refreshNumber = 0;
 let pollTimer;
 
@@ -52,6 +56,7 @@ async function refresh(message = '') {
     if (page === 'ledger' || page === 'reversals') bindLedger(page === 'reversals', refresh);
     if (page === 'plans') bindPlans(refresh);
     if (page === 'report') pollTimer = bindReport(refresh);
+    if (page === 'lineage') bindLineage();
   } catch (failure) {
     if (ticket !== refreshNumber) return;
     if (failure.status === 401) return logout();

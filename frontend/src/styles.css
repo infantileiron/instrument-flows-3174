@@ -129,6 +129,9 @@ input, select { min-height: 37px; width: 100%; min-width: 0; padding: 6px 8px; b
 .net-foot strong { font: 700 19px var(--mono); }
 .lineage { border-top: 1px solid var(--line); color: var(--muted); padding: 14px 19px; display: grid; gap: 7px; overflow-wrap: anywhere; }
 .lineage summary { cursor: pointer; color: var(--accent); }
+.lineage-link { display: inline-block; text-decoration: none; padding: 7px 13px; }
+.lineage-note { color: var(--muted); font-size: 12px; padding: 4px 2px 0; }
+.stats dd.positive { color: var(--green); }
 .login-layout { display: grid; grid-template-columns: 57% 43%; min-height: 100vh; }
 .login-cover { position: relative; display: flex; flex-direction: column; justify-content: space-between; color: var(--rail-light); padding: clamp(26px, 5.7vw, 88px);
   background: repeating-linear-gradient(to bottom, transparent 0 17px, oklch(74% .09 35 / .30) 17px 18px, transparent 18px 23px) left bottom 24% / 100% 115px no-repeat, var(--rail); }

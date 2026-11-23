@@ -76,6 +76,7 @@ export function reportPage() {
     <p>${result.receipt_count} 份生效凭据 · 签领 ${result.loan} − 冲销 ${result.reversal} = 有效调借 ${result.total_out}</p>
     <p>快照 SHA-256 <span class="code">${e(report.snapshot_hash)}</span></p>
     <details><summary>展开凭据编号</summary><p class="code">${report.receipt_refs.map(e).join('　') || '无'}</p></details>
+    ${result.lineage ? `<p><a class="outline lineage-link" href="#lineage/${report.id}">打开转借溯源 → 沿签领编号对账来源馆（来源不明 ${result.lineage.unknown_quantity} 件）</a></p>` : ''}
     ${report.published_at ? `<p>复核席位 <span class="code">${e(report.published_by)}</span>　发布时间（UTC） <span class="code">${e(report.published_at.replace('T', ' '))}</span></p>` : ''}</div>`);
   return heading + summary + stats + `<div id="report-body">${reportBody(report)}</div>` + lineage;
 }

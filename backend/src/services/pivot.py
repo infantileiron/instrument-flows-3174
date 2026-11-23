@@ -2,6 +2,7 @@ from collections import defaultdict
 from itertools import combinations, permutations
 
 from src.constants.domain import ReceiptKind
+from src.services.lineage import LineageMismatch, trace_lineage
 from src.utils.crypto import signed
 
 
@@ -60,6 +61,10 @@ def calculate(snapshot):
                           == result['loan'] - result['reversal'])
     if not result['verified']:
         raise LedgerMismatch('签名净额与矩阵边际不守恒')
+    try:
+        result['lineage'] = trace_lineage(snapshot)
+    except LineageMismatch as exc:
+        raise LedgerMismatch(str(exc)) from exc
     return result
 
 
